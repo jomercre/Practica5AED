@@ -36,7 +36,7 @@ knitr::opts_chunk$set(fig.width=8, fig.height=4)
 
 ```{r}
 library(pacman)
-packages = c("knitr", "ggplot2","tidyr","dplyr","readr")
+packages = c("knitr", "ggplot2","tidyr","dplyr","readr",'stringr')
 pacman::p_load(char=packages)
 ```
 
@@ -117,23 +117,22 @@ Nota: Puedes reemplazar los valores para cada variable del dataframe usando `mut
 ```{r Solucion ejercicio 2, include=TRUE, echo=TRUE, eval=TRUE, results=TRUE}
 # DEBEMOS ELIMINAR TAMBIEN LOS VALROES IGUALES A CERO YA QUE SE TRATA DE LONGITUDES DE PARTES DE UNA FLOR. NO PUEDEN SER O
 
-var = c('Sepal.Lenght', 'Sepal.Width', 'Petal.Length', 'Petal.Width')
+var = c('Sepal.Length', 'Sepal.Width', 'Petal.Length', 'Petal.Width')
 
-for (i in var) {
-  dirty_iris <- dirty_iris %>% mutate(i = ifelse(i == 0 | is.infinite(i) | i < 0,NA, i))
-}
+dirty_iris_2 <- dirty_iris %>%
+  mutate(across(all_of(var),~ifelse(.x <= 0 | is.infinite(.x), NA, .x)))
+
 ```
-
 ## Ejercicio 3: Valores perdidos y observaciones completas
 
   * Calcula el número y porcentaje de observaciones completas (muestras sin ningún dato perdido) empleando `complete.cases` (detecta todos los registros sin datos faltantes).
   * Emplea después la función `na.omit` para quedarnos solo con las filas con datos completos en un nuevo data frame `clean_iris`.
 
 ```{r Solucion ejercicio 3, include=TRUE, echo=TRUE, eval=TRUE, results=TRUE}
-sum(complete.cases(dirty_iris))
+sum(complete.cases(dirty_iris_2))
 ```
 ```{r}
-clean_iris <- na.omit(dirty_iris)
+clean_iris <- na.omit(dirty_iris_2)
 ```
 
 # Detección de outliers univariante
@@ -146,7 +145,7 @@ En esta sección, vamos a centrarnos en métodos de detección univariantes, as�
 
 La presencia de outliers puede producir una gran influencia en caracterizaciones sencillas de los datos, como la media y la desviación típica.
 
-Empleado la función `summarise y across`, calcula la media, la desviación típica, mediana, la  _median absolute deviation from the median_ (MADM) y el _interquartile range_ (IQR) de las variables numéricas. 
+Empleado la función `summarise y across`, calcula la media, la desviación típica, mediana, la  _median absolute deviation from the median_ (MADM) y el _interquartile range_ (IQR) de las variables numéricas.
 Hazlo para el data frame con observaciones completas `clean_iris` (que no tiene NA pero tiene menos observaciones) y para el data frame con datos faltantes `dirty_iris` (que presenta muchos NA pero tiene todas las observaciones).
 
   * Ten en cuenta que no se puede realizar un análisis estadístico con datos faltantes, pero en la mayoría de los casos se puede optar por no considerar dichos valores al realizar los cálculos (parámetro `na.rm=TRUE`).
@@ -154,9 +153,29 @@ Hazlo para el data frame con observaciones completas `clean_iris` (que no tiene 
   * Compara los resultados para los dos conjuntos en la variable `Petal.Length`.
 
 ```{r , include = TRUE}
+madm <- function(col) {
+  return (1.4826*(median(abs(col-median(col,na.rm=T)),na.rm=T)))
+}
+
+
+clean_stat <- clean_iris %>% summarise(across(where(is.numeric), 
+                         list(mean = ~mean(.,na.rm=T), std = ~sd(.,na.rm=T),
+                              madm = ~madm(.), IQR = ~IQR(.,na.rm=T))))
+
+clean_stat
+
+dirty_stat <- dirty_iris_2 %>% summarise(across(where(is.numeric), 
+                         list(mean = ~mean(.,na.rm=T), std = ~sd(.,na.rm=T),
+                              madm = ~madm(.), IQR = ~IQR(.,na.rm=T))))
+
+dirty_stat
 
 ```
-
+Sacamos por pantalla los valores de Petal.Length.
+```{r}
+clean_stat[names(clean_stat)[str_detect(names(clean_stat),pattern='Petal.Length')]]
+dirty_stat[names(dirty_stat)[str_detect(names(dirty_stat),pattern='Petal.Length')]]
+```
 
 ## Ejercicio 5: Métodos de detección de outliers
 
