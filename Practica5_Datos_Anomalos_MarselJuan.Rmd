@@ -274,7 +274,19 @@ clean_out_PL %>%
   summarise(across(.cols = matches("Petal.Length.+"), 
       .fns = list(numOut = ~sum(.x, na.rm = TRUE))))
 ```
+```{r}
+clean_out_PL %>% filter(Petal.Length_sigma == T) %>% arrange(-Petal.Length) %>%
+  select(Petal.Length,Petal.Length_sigma)
 
+clean_out_PL %>% filter(Petal.Length_hample == T) %>% arrange(-Petal.Length) %>%
+  select(Petal.Length,Petal.Length_hample)
+
+clean_out_PL %>% filter(Petal.Length_boxplot == T) %>% arrange(-Petal.Length) %>%
+  select(Petal.Length,Petal.Length_boxplot)
+
+clean_out_PL %>% filter(Petal.Length_percentil == T) %>% arrange(-Petal.Length) %>%
+  select(Petal.Length,Petal.Length_percentil)
+```
 
 
 ## Ejercicio 8: Representación gráfica
