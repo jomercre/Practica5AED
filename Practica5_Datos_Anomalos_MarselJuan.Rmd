@@ -120,10 +120,9 @@ Nota: Puedes reemplazar los valores para cada variable del dataframe usando `mut
 var = c('Sepal.Lenght', 'Sepal.Width', 'Petal.Length', 'Petal.Width')
 
 for (i in var) {
-  clean_iris <- dirty_iris %>% mutate(i = ifelse(i == 0 | is.infinite(i) | i < 0,NA, i))
+  dirty_iris <- dirty_iris %>% mutate(i = ifelse(i == 0 | is.infinite(i) | i < 0,NA, i))
 }
 ```
-
 
 ## Ejercicio 3: Valores perdidos y observaciones completas
 
@@ -131,7 +130,10 @@ for (i in var) {
   * Emplea después la función `na.omit` para quedarnos solo con las filas con datos completos en un nuevo data frame `clean_iris`.
 
 ```{r Solucion ejercicio 3, include=TRUE, echo=TRUE, eval=TRUE, results=TRUE}
-
+sum(complete.cases(dirty_iris))
+```
+```{r}
+clean_iris <- na.omit(dirty_iris)
 ```
 
 # Detección de outliers univariante
