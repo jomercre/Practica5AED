@@ -38,7 +38,6 @@ knitr::opts_chunk$set(fig.width=8, fig.height=4)
 library(pacman)
 packages = c("knitr", "ggplot2","tidyr","dplyr","readr")
 pacman::p_load(char=packages)
-
 ```
 
 ```{r Solucion opciones visualizacion, eval=F, include=F}
@@ -77,7 +76,26 @@ Inspecciona visualmente los valores del conjunto de datos (`View`) y ordena de m
 
 ```{r Solucion ejercicio 1, include=TRUE, echo=TRUE, eval=TRUE, results=TRUE}
 # Medidas con valores faltantes, longitudes negativas y cero
-
+View(dirty_iris)
+```
+```{r}
+cat('Nº de NA s =', sum(is.na(dirty_iris)), '\n')
+cat('Nº de distancias negativas =', sum(dirty_iris<0,na.rm=T), '\n')
+cat('Nº de longitudes nulas =', sum(dirty_iris==0,na.rm=T), '\n')
+cat('Nº de longitudes nulas =', sum(sapply(dirty_iris,is.infinite),na.rm=T), '\n')
+```
+Ordenamos cada variable de mayor a menor.
+```{r}
+dirty_iris %>% arrange(-Sepal.Length) %>% View(.)
+```
+```{r}
+dirty_iris %>% arrange(-Sepal.Width) %>% View(.)
+```
+```{r}
+dirty_iris %>% arrange(-Petal.Length) %>% View(.)
+```
+```{r}
+dirty_iris %>% arrange(-Petal.Width) %>% View(.)
 ```
 
 ## Ejercicio 2: Valores especiales
@@ -99,7 +117,11 @@ Nota: Puedes reemplazar los valores para cada variable del dataframe usando `mut
 ```{r Solucion ejercicio 2, include=TRUE, echo=TRUE, eval=TRUE, results=TRUE}
 # DEBEMOS ELIMINAR TAMBIEN LOS VALROES IGUALES A CERO YA QUE SE TRATA DE LONGITUDES DE PARTES DE UNA FLOR. NO PUEDEN SER O
 
+var = c('Sepal.Lenght', 'Sepal.Width', 'Petal.Length', 'Petal.Width')
 
+for (i in var) {
+  clean_iris <- dirty_iris %>% mutate(i = ifelse(i == 0 | is.infinite(i) | i < 0,NA, i))
+}
 ```
 
 
