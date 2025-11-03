@@ -169,7 +169,6 @@ dirty_stat <- dirty_iris_2 %>% summarise(across(where(is.numeric),
                               madm = ~madm(.), IQR = ~IQR(.,na.rm=T))))
 
 dirty_stat
-
 ```
 Sacamos por pantalla los valores de Petal.Length.
 ```{r}
@@ -195,7 +194,7 @@ Escribe una función que detecte los outliers de un vector $x$ para cada uno de 
 reglasigma <- function(x) {
   
   media <- mean(x,na.rm=T)
-  desv <- std(x,na.rm=T)
+  desv <- sd(x,na.rm=T)
   sigma <- (desv)**0.5
   
   return (ifelse(is.na(x), NA,ifelse(x > 3*sigma,T,F)))
@@ -232,6 +231,11 @@ reglapercentil <- function(x) {
 }
 ```
 
+Sacamos por pantalla la posición de los outliers de Petal.Length.
+```{r}
+clean_out[names(clean_out)[str_detect(names(clean_out),pattern='Petal.Length')]]
+dirty_out[names(dirty_out)[str_detect(names(dirty_out),pattern='Petal.Length')]]
+```
 
 ## Ejercicio 6: Detección de outliers
 
@@ -239,7 +243,22 @@ Utiliza la función `mutate` y `across` para identificar los outliers en la vari
 Nota: podría extenderse la aplicación a todas las variables numéricas usando también `mutate`, `across` y `where`. 
 
 ```{r Solucion ejercicio 6, include=TRUE, echo=TRUE, eval=TRUE, results=TRUE}
+clean_out <- clean_iris %>% summarise(across(where(is.numeric), 
+                         list(sigma = ~reglasigma(.), 
+                              hample = ~reglahampel(.),
+                              boxplot = ~reglaboxplot(.), 
+                              percentil = ~reglapercentil(.))))
 
+clean_out
+
+dirty_out <- dirty_iris_2 %>% summarise(across(where(is.numeric), 
+                         list(sigma = ~reglasigma(.), 
+                              hample = ~reglahampel(.),
+                              boxplot = ~reglaboxplot(.), 
+                              percentil = ~reglapercentil(.))))
+
+dirty_out
+```
 
 
 ```
