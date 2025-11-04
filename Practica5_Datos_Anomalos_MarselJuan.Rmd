@@ -294,9 +294,14 @@ clean_out_PL %>% filter(Petal.Length_percentil == T) %>% arrange(-Petal.Length) 
 Representa gráficamente los datos de `Petal.Length` (distribución de puntos en el eje $y$) para todas las reglas de detección implementadas (repartidas en el eje $x$) mostrando los valores identificados como típicos y los identificados como outliers en diferente color. Usa la función `pivot_longer` para poder agrupar por reglas y colorear los outliers fácilmente.
 
 Nota: usa en `geom_point` con la opción `position='jitter'` para mejorar la legibilidad del gráfico.
+```{r}
+df <- clean_out_PL %>% pivot_longer(-Petal.Length, names_to='Metodo',values_to = 'Outlier', names_prefix = 'Petal.Length_')
+```
+
 
 ```{r Solucion ejercicio 8, include=TRUE, echo=TRUE, eval=TRUE, results=TRUE}
-
+ggplot(df,aes(x = Metodo, y = Petal.Length)) +
+  geom_jitter(aes(color=Outlier))
 ```
 
 # Imputación de datos
